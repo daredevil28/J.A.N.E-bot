@@ -1,3 +1,6 @@
 {
-	"token": "BOT_TOKEN"
+	"token": "BOT_TOKEN",
+	"server": "SERVER_ID_THAT_HAS_THE_ROLE",
+	"role": "ID_OF_THE_ROLE",
+	"owner": "BOT_OWNER"
 }

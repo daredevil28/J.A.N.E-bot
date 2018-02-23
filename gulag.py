@@ -5,9 +5,14 @@ import json
 
 description = "The incorrect Java Autonomous Noob Enlighter"
 
+#set some variables
+
 data = json.load(open("token.json"))	
 bot = commands.Bot(command_prefix='j!', description=description)
 token = data["token"]
+server = data["server"]
+role = data["role"]
+owner = data["owner"]
 
 
 @bot.event
@@ -27,7 +32,7 @@ async def gulag(ctx):
 async def mute(ctx, member : discord.Member):
 	try:
 		if ctx.message.channel.permissions_for(ctx.message.author).manage_messages:
-			await bot.add_roles(member, discord.Role(server=discord.Server(id='160246330701250560'), id='377339046772604928'))
+			await bot.add_roles(member, discord.Role(server=discord.Server(id=server), id=role))
 			await bot.send_file(ctx.message.channel, fp="gulag.png", content='{0.name} has been gulagged'.format(member))
 	except Exception as e:
 		await bot.say(e)
@@ -36,7 +41,7 @@ async def mute(ctx, member : discord.Member):
 async def unmute(ctx, member : discord.Member):
 	try:
 		if ctx.message.channel.permissions_for(ctx.message.author).manage_messages:
-			await bot.remove_roles(member, discord.Role(server=discord.Server(id='160246330701250560'), id='377339046772604928'))
+			await bot.remove_roles(member, discord.Role(server=discord.Server(id=server), id=role))
 			await bot.say("{0.name} has been ungulagged".format(member))
 	except Exception as e:
 		await bot.say(e)
@@ -54,7 +59,7 @@ async def age_error():
 	
 @bot.command(pass_context=True)
 async def say(ctx, *, text : str):
-	if ctx.message.author.id == '157167815512555520':
+	if ctx.message.author.id == owner:
 		await bot.send_message(ctx.message.channel, text)
 		await bot.delete_message(ctx.message)
 
@@ -62,7 +67,7 @@ async def say(ctx, *, text : str):
 async def say_error(error, ctx):
 	await bot.say("Error! Something went wrong!")
 
-
+#To lazy to properly code all this
 @bot.event
 async def on_message(message):
 	if message.content.startswith("j!galug"):
