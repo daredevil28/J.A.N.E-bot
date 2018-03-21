@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import json
+import subprocess
 
 description = "The incorrect Java Autonomous Noob Enlighter"
 
@@ -21,6 +22,8 @@ async def on_ready():
 	print(bot.user)
 	print("I smell the gulag today")
 	print("------")
+
+#the gulag command(basically mute/unmute)
 
 @bot.group(pass_context=True)
 async def gulag(ctx):
@@ -46,6 +49,8 @@ async def unmute(ctx, member : discord.Member):
 	except Exception as e:
 		await bot.say(e)
 
+#Returns creation date		
+
 @bot.command(pass_context=True)
 async def age(ctx, member : discord.User = None):
 	if member is None:
@@ -56,6 +61,7 @@ async def age(ctx, member : discord.User = None):
 async def age_error():
 	await bot.say("Something went wrong! Did you specify a user?")
 
+#Make the bot say something
 	
 @bot.command(pass_context=True)
 async def say(ctx, *, text : str):
@@ -66,6 +72,24 @@ async def say(ctx, *, text : str):
 @say.error
 async def say_error(error, ctx):
 	await bot.say("Error! Something went wrong!")
+
+#Execute shell commands	
+
+@bot.command(pass_context=True)
+async def eval(ctx, *, text : str):
+    if ctx.message.author.id == owner:
+        asyncio.run_coroutine_threadsafe(handle_cmd(ctx.message,text),bot.loop)
+
+async def handle_cmd(msg,cmd):
+    try:
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        while p.poll() == None:
+            await asyncio.sleep(0.1)
+        encoding = p.stdout.read().decode()
+        await bot.send_message(msg.channel,"``\n" + encoding + "\n``")
+    except Exception as e:
+        print(e)
+        await bot.send_message(msg.channel,e)
 
 #To lazy to properly code all this
 @bot.event
