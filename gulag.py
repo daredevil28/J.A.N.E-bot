@@ -18,7 +18,7 @@ role = data["role"]
 owner = data["owner"]
 shell_running = False
 cmd_buffer = []
-
+shell_proc = None
 
 @bot.event
 async def on_ready():
@@ -90,9 +90,27 @@ async def eval(ctx, *, text : str):
 			cmd_buffer.append(text)
 
 @bot.command(pass_context=True)
-async def seval(ctx):
+async def eval(ctx, *, text : str):
+	global shell_running,cmd_buffer
 	if ctx.message.author.id == owner:
-		shell_running = False
+		if not shell_running:
+			cmd_buffer = [text]
+			shell_proc = None
+			asyncio.run_coroutine_threadsafe(handle_cmd(ctx.message),bot.loop)
+		else:
+			cmd_buffer.append(text)
+
+@bot.command(pass_context=True)
+async def ceval(ctx): #Send CTRL-C to shell
+	global shell_proc
+	if ctx.message.author.id == owner:
+		shell_proc.send_signal(subprocess.signal.SIGINT)
+
+@bot.command(pass_context=True)
+async def keval(ctx): #Kill shell
+	global shell_proc
+	if ctx.message.author.id == owner:
+		shell_proc.send_signal(subprocess.signal.SIGKILL)
 
 def nbread(fd):
 	try:
@@ -101,9 +119,10 @@ def nbread(fd):
 		return ''
 
 async def handle_cmd(msg):
-	global shell_running,cmd_buffer
+	global shell_running,cmd_buffer,shell_proc
 	try:
 		p = subprocess.Popen(["/bin/bash"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE,universal_newlines=True)
+		shell_proc = p
 		shell_running = True
 		fl = fcntl.fcntl(p.stdout.fileno(), fcntl.F_GETFL)
 		fcntl.fcntl(p.stdout.fileno(), fcntl.F_SETFL, fl | os.O_NONBLOCK)
@@ -124,9 +143,17 @@ async def handle_cmd(msg):
 					strs = [stdout[i:i+1500] for i in range(0, len(stdout), 1500)]
 					for i in strs:
 						await bot.send_message(msg.channel,"``\n" + i + "\n``")
-						await asyncio.sleep(0.5)
+						await asyncio.sleep(0.1)
 				else:
 					await bot.send_message(msg.channel,"``\n" + stdout + "\n``")
+			if stderr:
+				if len(stderr) > 1500:
+					strs = [stderr[i:i+1500] for i in range(0, len(stderr), 1500)]
+					for i in strs:
+						await bot.send_message(msg.channel,"``\n" + i + "\n``")
+						await asyncio.sleep(0.5)
+				else:
+					await bot.send_message(msg.channel,"``\n" + stderr + "\n``")
 			await asyncio.sleep(0.5)
 		await bot.send_message(msg.channel,"Shell terminated")
 	except:
