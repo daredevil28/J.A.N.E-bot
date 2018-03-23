@@ -81,16 +81,6 @@ async def say_error(error, ctx):
 
 @bot.command(pass_context=True)
 async def eval(ctx, *, text : str):
-	global shell_running,cmd_buffer
-	if ctx.message.author.id == owner:
-		if not shell_running:
-			cmd_buffer = [text]
-			asyncio.run_coroutine_threadsafe(handle_cmd(ctx.message),bot.loop)
-		else:
-			cmd_buffer.append(text)
-
-@bot.command(pass_context=True)
-async def eval(ctx, *, text : str):
 	global shell_running,cmd_buffer,shell_proc
 	if ctx.message.author.id == owner:
 		if not shell_running:
