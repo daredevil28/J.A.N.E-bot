@@ -4,6 +4,7 @@ import asyncio
 import json
 import subprocess
 import traceback
+import fcntl,os
 
 description = "The incorrect Java Autonomous Noob Enlighter"
 
