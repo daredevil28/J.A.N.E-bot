@@ -14,6 +14,8 @@ token = data["token"]
 server = data["server"]
 role = data["role"]
 owner = data["owner"]
+shell_running = False
+cmd_buffer = []
 
 
 @bot.event
@@ -77,19 +79,58 @@ async def say_error(error, ctx):
 
 @bot.command(pass_context=True)
 async def eval(ctx, *, text : str):
-    if ctx.message.author.id == owner:
-        asyncio.run_coroutine_threadsafe(handle_cmd(ctx.message,text),bot.loop)
+	global shell_running,cmd_buffer
+	if ctx.message.author.id == owner:
+		if not shell_running:
+			cmd_buffer = [text]
+			asyncio.run_coroutine_threadsafe(handle_cmd(ctx.message),bot.loop)
+		else:
+			cmd_buffer.append(text)
 
-async def handle_cmd(msg,cmd):
-    try:
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-        while p.poll() == None:
-            await asyncio.sleep(0.1)
-        encoding = p.stdout.read().decode()
-        await bot.send_message(msg.channel,"``\n" + encoding + "\n``")
-    except Exception as e:
-        print(e)
-        await bot.send_message(msg.channel,e)
+@bot.command(pass_context=True)
+async def seval(ctx):
+	if ctx.message.author.id == owner:
+		shell_running = False
+
+def nbread(fd):
+	try:
+		return fd.read()
+	except:
+		return ''
+
+async def handle_cmd(msg):
+	global shell_running,cmd_buffer
+	try:
+		p = subprocess.Popen(["/bin/bash"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE,universal_newlines=True)
+		shell_running = True
+		fl = fcntl.fcntl(p.stdout.fileno(), fcntl.F_GETFL)
+		fcntl.fcntl(p.stdout.fileno(), fcntl.F_SETFL, fl | os.O_NONBLOCK)
+		fl = fcntl.fcntl(p.stderr.fileno(), fcntl.F_GETFL)
+		fcntl.fcntl(p.stderr.fileno(), fcntl.F_SETFL, fl | os.O_NONBLOCK)
+		while shell_running:
+			if p.poll() != None:
+				shell_running = False
+				break
+			if cmd_buffer:
+				p.stdin.write(cmd_buffer[0]+"\n")
+				cmd_buffer.remove(cmd_buffer[0])
+			p.stdin.flush()
+			stdout = nbread(p.stdout)
+			stderr = nbread(p.stderr)
+			if stdout:
+				if len(stdout) > 1500:
+					strs = [stdout[i:i+1500] for i in range(0, len(stdout), 1500)]
+					for i in strs:
+						await bot.send_message(msg.channel,"``\n" + i + "\n``")
+						await asyncio.sleep(0.5)
+				else:
+					await bot.send_message(msg.channel,"``\n" + stdout + "\n``")
+			await asyncio.sleep(0.5)
+		await bot.send_message(msg.channel,"Shell terminated")
+	except:
+		tb = traceback.format_exc()
+		print("Error:\n%s"%tb)
+		await bot.send_message(msg.channel,"Error:\n```%s```"%tb)
 
 #To lazy to properly code all this
 @bot.event
