@@ -3,6 +3,7 @@ from discord.ext import commands
 import asyncio
 import json
 import subprocess
+import traceback
 
 description = "The incorrect Java Autonomous Noob Enlighter"
 
