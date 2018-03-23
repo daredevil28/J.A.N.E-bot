@@ -91,7 +91,7 @@ async def eval(ctx, *, text : str):
 
 @bot.command(pass_context=True)
 async def eval(ctx, *, text : str):
-	global shell_running,cmd_buffer
+	global shell_running,cmd_buffer,shell_proc
 	if ctx.message.author.id == owner:
 		if not shell_running:
 			cmd_buffer = [text]
