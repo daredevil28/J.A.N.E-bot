@@ -77,6 +77,14 @@ async def say(ctx, *, text : str):
 async def say_error(error, ctx):
 	await bot.say("Error! Something went wrong!")
 
+@bot.command(pass_context=True)
+async def access(ctx):
+	if ctx.message.channel.id == "439139494684262400":
+		member = ctx.message.author
+		await bot.delete_message(ctx.message)
+		if discord.Role(server=discord.Server(id=server), id="439138951916290059") not in member.roles:
+			await bot.add_roles(member, discord.Role(server=discord.Server(id=server), id=439138951916290059))
+
 #Execute shell commands	
 
 @bot.command(pass_context=True)
