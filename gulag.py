@@ -91,10 +91,17 @@ async def science(ctx):
 		member = ctx.message.author
 		if discord.Role(server=discord.Server(id=server), id="439700931932585987") not in member.roles:
 			await bot.add_roles(member, discord.Role(server=discord.Server(id=server), id=439700931932585987))
-			await bot.say("You have recieved the Scientist role")
+			msg = await bot.send_message(ctx.message.channel, "You have recieved the Scientist role")
+			await asyncio.sleep(10)
+			await bot.delete_message(ctx.message)
+			await bot.delete_message(msg)
+			
 		else:
 			await bot.remove_roles(member, discord.Role(server=discord.Server(id=server), id="439700931932585987"))
-			await bot.say("You no longer have the Scientist role")
+			msg = await bot.say("You no longer have the Scientist role")
+			await asyncio.sleep(10)
+			await bot.delete_message(ctx.message)
+			await bot.delete_message(msg)
 #Execute shell commands	
 
 @bot.command(pass_context=True)
@@ -180,7 +187,7 @@ async def on_message(message):
 			await bot.send_file(message.channel, fp="haha.png")
 	if message.channel.id == "326711493674532864":
 		await bot.add_reaction(message, '👍')
-		await bot.add_reaction(message, '👎')
+		await bot.add_reaction(message, '👎')	
 		await bot.add_reaction(message, discord.Emoji(id=405404517358764043, server=discord.Server(id=160246330701250560)))
 	if message.content.lower() == "jane fly sun":
 		await bot.send_message(message.channel, "No you can not fly into the sun, you will most certainly burn up and die")
