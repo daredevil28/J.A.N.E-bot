@@ -85,6 +85,16 @@ async def access(ctx):
 		if discord.Role(server=discord.Server(id=server), id="439138951916290059") not in member.roles:
 			await bot.add_roles(member, discord.Role(server=discord.Server(id=server), id=439138951916290059))
 
+@bot.command(pass_context=True)
+async def science(ctx):
+	if ctx.message.server.id == "160246330701250560":
+		member = ctx.message.author
+		if discord.Role(server=discord.Server(id=server), id="439700931932585987") not in member.roles:
+			await bot.add_roles(member, discord.Role(server=discord.Server(id=server), id=439700931932585987))
+			await bot.say("You have recieved the Scientist role")
+		else:
+			await bot.remove_roles(member, discord.Role(server=discord.Server(id=server), id="439700931932585987"))
+			await bot.say("You no longer have the Scientist role")
 #Execute shell commands	
 
 @bot.command(pass_context=True)
