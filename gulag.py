@@ -11,7 +11,7 @@ description = "The incorrect Java Autonomous Noob Enlighter"
 #set some variables
 
 data = json.load(open("token.json"))	
-bot = commands.Bot(command_prefix='j!', description=description)
+bot = commands.Bot(command_prefix='jt!', description=description)
 token = data["token"]
 server = data["server"]
 role = data["role"]
@@ -84,6 +84,7 @@ async def access(ctx):
 		await bot.delete_message(ctx.message)
 		if discord.Role(server=discord.Server(id=server), id="439138951916290059") not in member.roles:
 			await bot.add_roles(member, discord.Role(server=discord.Server(id=server), id=439138951916290059))
+			await bot.send_message(member, "You have recieved access! The IP for the server is starquest.spacebeaverstudios.com.")
 
 @bot.command(pass_context=True)
 async def science(ctx):
