@@ -11,7 +11,7 @@ description = "The incorrect Java Autonomous Noob Enlighter"
 #set some variables
 
 data = json.load(open("token.json"))	
-bot = commands.Bot(command_prefix='jt!', description=description)
+bot = commands.Bot(command_prefix='j!', description=description)
 token = data["token"]
 server = data["server"]
 role = data["role"]
