@@ -84,7 +84,7 @@ async def access(ctx):
 		await bot.delete_message(ctx.message)
 		if discord.Role(server=discord.Server(id=server), id="439138951916290059") not in member.roles:
 			await bot.add_roles(member, discord.Role(server=discord.Server(id=server), id=439138951916290059))
-			await bot.send_message(member, "You have recieved access! The IP for the server is starquest.spacebeaverstudios.com.")
+			await bot.send_message(member, "You have recieved access! The IP for the server is starquest.spacebeaverstudios.com. Click this link to see more info about StarQuest and how to get the resource pack! <https://discordapp.com/channels/160246330701250560/351432162232500225?jump=394914296796151808>")
 
 @bot.command(pass_context=True)
 async def science(ctx):
